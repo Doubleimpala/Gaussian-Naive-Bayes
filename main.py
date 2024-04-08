@@ -11,8 +11,8 @@ data = pd.read_csv('data.txt',sep = ' ', header=None)
 data = np.array(data)
 x, y = data[:, 1], data[:, 2]
 
-meanx = 
-variancex = 
+meanx = np.mean(x)
+variancex = np.standardeviation(x)**2
 vx = input()
 vy = input()
 meany = 
