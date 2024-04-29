@@ -6,35 +6,52 @@ import math
 import matplotlib.pyplot as matplotlib
 
 
-data = pd.read_csv('data.txt',sep = ' ', header=None)
-#print(data)
-data = np.array(data)
-x, y = data[:, 1], data[:, 2]
-classes = data[:, 0]
-classArray = np.array(classes)
-meanx = np.mean(x)
-variancex = np.std(x)**2
-print('Input x')
-vx = input()
-print('Input y')
-vy = input()
-meany = np.mean(y)
-variancey = np.std(y)**2
-classProbs = computeClassProbs(vx, vy, meanx, variancex, meany, variancey, classArray)
-print(classProbs)
+def main():
+  data = pd.read_csv('data.txt', sep=' ', header=None)
+  data = np.array(data)
+  x, y = data[:, 1], data[:, 2]
+  classes = data[:, 0]
 
-def computeClassProbs(vx, vy, meanx, variancex, meany, variancey, classArray):
-  for o in range(len(classArray)):
-    indices = [i for i, x in enumerate(classArray) if x == o]
-    priorProb = len(indices)/len(classArray)
-    likelyhood_x = pgivenc(vx,variancex,meanx)
-    likelyhood_y = pgivenc(vy,variancey,meany)
-    evidenceProb_x = 1#P(Xi)
-    evidenceProb_y = 1#P(Xi)
-    #This is wrong. Fix.
-    classProbs[o] = (priorProb)
-  return classProbs
+  print('Input x')
+  vx = float(input())
+  print('Input y')
+  vy = float(input())
 
-#Fix this function. I think it requires both dimensions to work? x and y?
+  unique_classes = np.unique(classes)
+  classProbs = np.zeros(len(unique_classes))
+  ############
+  
+  for o, c in enumerate(unique_classes):
+      indices = np.where(classes == c)[0]
+      subset_x = x[indices]
+      subset_y = y[indices]
+
+      meanx = np.mean(subset_x)
+      variancex = np.var(subset_x)
+
+      meany = np.mean(subset_y)
+      variancey = np.var(subset_y)
+
+      priorProb = len(indices) / len(classes)
+
+      likelyhood_x = pgivenc(vx, variancex, meanx)
+      likelyhood_y = pgivenc(vy, variancey, meany)
+
+      # Assuming evidence probabilities are 1 for simplicity
+      evidenceProb_x = 1
+      evidenceProb_y = 1
+    #Article I looked at had these, but nobody else I asked had evidence probabilities. I also couldn't find how to calculate them so I just left it as 1.
+
+      classProbs[o] = (priorProb * likelyhood_x + priorProb * likelyhood_y) / 2
+
+
+  for i, g in enumerate(classProbs):
+    print("\n\nclass " + str(i) + " probability:\n")
+    print(g)
+
+
 def pgivenc(v,variance,mean):
   return (1/(2*math.pi*variance**2))*((math.e)**((-(v-mean)**2)/(2*(variance**2))))
+
+if __name__ == "__main__":
+  main()
